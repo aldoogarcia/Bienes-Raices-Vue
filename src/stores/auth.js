@@ -1,25 +1,39 @@
+import {ref, computed} from 'vue'
 import {defineStore} from 'pinia'
 import { useFirebaseAuth } from 'vuefire';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export const useAuthStore = defineStore('auth',()=>{
+    const userath= ref({})
+    const errorMsg= ref('')
     const auth= useFirebaseAuth();
+    const errorCodes= {
+        'auth/invalid-credential': 'El usuario o contraseña son incorrectos'
+    }
 
     function login ({email,password}){
         signInWithEmailAndPassword(auth,email,password)
         .then((useCredenciales)=>{
-            console.log(useCredenciales)
+            const {user}=useCredenciales
+            userath.value=user
+
         })
         .catch((e)=>{
-            console.log(e.code)
-            console.log(e.message)
-            console.log(email)
-            console.log(password)
+            errorMsg.value=errorCodes[e.code]
 
+            setTimeout(()=>{
+                errorMsg.value=''
+            },7000)
         })
     }
 
+    const hasError= computed(()=>{
+        return errorMsg.value
+    })
+
     return{
-        login
+        login,
+        errorMsg,
+        hasError
     }
 })

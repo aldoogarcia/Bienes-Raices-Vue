@@ -27,8 +27,20 @@ const submit= handleSubmit((values)=>{
             Inicia Secion con correo
         </v-card-subtitle>
 
+        <v-alert
+            class="mb-3 rounded-lg "
+            v-if="auth.hasError"
+            color="error"
+            variant="outlined"
+            border="top"
+            icon="$error"
+            :title="auth.errorMsg"
+        ></v-alert>
+
+
         <v-form>
             <v-text-field
+                
                 v-model="email.value.value"
                 label="Correo Electronico"
                 type="text"
