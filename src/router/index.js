@@ -27,12 +27,12 @@ const router = createRouter({
         {
         path: '/admin/nueva',
         name: 'admin-nueva',
-        component: ()=> import('../views/admin/NuuevaPropiedadView.vue'),
+        component: ()=> import('../views/admin/NuevaPropiedadView.vue'),
         },
         {
         path: '/admin/editar/:id',
         name: 'admin-editar',
-        component: ()=> import('../views/admin/EditarPropiedadView.vue'),
+        component: ()=> import('../views/admin/EditarPropiedadesView.vue'),
         },
       ]
     }
