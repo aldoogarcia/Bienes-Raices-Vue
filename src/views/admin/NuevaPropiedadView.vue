@@ -1,7 +1,28 @@
         
 <script setup>
+import {useForm,useField} from 'vee-validate'
+import {validationSchema,imageSchema} from '@/validation/propiedadSchema.js'
 
-const items= [5,4,3,2,1,0].reverse()
+const {handleSubmit} = useForm({ // solo acepta una validacion por eso las juntamos
+    validationSchema:{
+        ...imageSchema,
+        ...validationSchema
+    }
+})
+const submit = handleSubmit((values)=>{
+    console.log(values)
+})
+
+const titulo = useField('titulo')
+const imagen = useField('imagen')
+const precio = useField('precio')
+const habitaciones = useField('habitaciones')
+const wc = useField('wc')
+const estacionamiento = useField('estacionamiento')
+const descripcion = useField('descripcion')
+
+
+const items= [5,4,3,2,1].reverse()
         
 </script>
 <template>
@@ -18,7 +39,9 @@ const items= [5,4,3,2,1,0].reverse()
 
         <v-form>
             <v-text-field
-                label="Titulo Propiedad "
+                label="Titulo Propiedad"
+                v-model="titulo.value.value"
+                :error-messages="titulo.errorMessage.value"
             />
             
             <v-row>
@@ -32,6 +55,8 @@ const items= [5,4,3,2,1,0].reverse()
                 label="Sube una imagen de la propiedad"
                 required
                 multiple
+                v-model="imagen.value.value"
+                :error-messages="imagen.errorMessage.value"
                 />
                     
                 </v-col>
@@ -42,6 +67,8 @@ const items= [5,4,3,2,1,0].reverse()
                 >
                     <v-text-field
                     label="Ingresa el precio "
+                    v-model="precio.value.value"
+                :error-messages="precio.errorMessage.value"
                     />
                 </v-col>
             </v-row>
@@ -54,6 +81,8 @@ const items= [5,4,3,2,1,0].reverse()
                     <v-select
                     label="Cuartos"
                     :items="items"
+                    v-model="habitaciones.value.value"
+                :error-messages="habitaciones.errorMessage.value"
                     />
                 </v-col>
                 <v-col
@@ -63,6 +92,8 @@ const items= [5,4,3,2,1,0].reverse()
                     <v-select
                     label="WC"
                     :items="items"
+                    v-model="wc.value.value"
+                :error-messages="wc.errorMessage.value"
                     />
                 </v-col>
                 <v-col
@@ -72,6 +103,8 @@ const items= [5,4,3,2,1,0].reverse()
                     <v-select
                     label="Lugares Estacionamiento"
                     :items="items"
+                    v-model="estacionamiento.value.value"
+                :error-messages="estacionamiento.errorMessage.value"
                     />
                 </v-col>
             </v-row>
@@ -79,6 +112,8 @@ const items= [5,4,3,2,1,0].reverse()
             <v-textarea
                 label="Descripcion"
                 class="mb-3"
+                v-model="descripcion.value.value"
+                :error-messages="descripcion.errorMessage.value"
             />
 
             <v-checkbox
@@ -89,6 +124,7 @@ const items= [5,4,3,2,1,0].reverse()
             block
             color="light-blue-darken-4"
             class="py-10 text-2xl"
+            @click="submit"
             >
                 Crear Propiedad
             </v-btn>
