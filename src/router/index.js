@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { onAuthStateChanged } from 'firebase/auth'
+import { useFirebaseAuth } from 'vuefire';
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -12,39 +14,65 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: ()=> import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue')
     },
+
+    //meta requerido
     {
       path: '/admin',
       name: 'admin',
-      component: ()=> import('../views/admin/AdminLayout.vue'),
-      children: [
+      component: () => import('../views/admin/AdminLayout.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/nueva',
+      name: 'admin-nueva',
+      component: () => import('../views/admin/NuevaPropiedadView.vue'),
+      meta: { requiresAuth: true }
+    },
+      
         {
-        path: '/admin/propiedades',
-        name: 'admin-propiedades',
-        component: ()=> import('../views/admin/AdminView.vue'),
+          path: '/propiedades',
+          name: 'admin-propiedades',
+          component: () => import('../views/admin/AdminView.vue'),
+          meta: { requiresAuth: true }
         },
         {
-        path: '/admin/nueva',
-        name: 'admin-nueva',
-        component: ()=> import('../views/admin/NuevaPropiedadView.vue'),
+          path: '/editar/:id',
+          name: 'admin-editar',
+          component: () => import('../views/admin/EditarPropiedadesView.vue'),
+          meta: { requiresAuth: true }
         },
-        {
-        path: '/admin/editar/:id',
-        name: 'admin-editar',
-        component: ()=> import('../views/admin/EditarPropiedadesView.vue'),
-        },
-      ]
-    }
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
+      
   ]
 })
+
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some(route => route.meta.requiresAuth)
+  if (requiresAuth) {
+    try {
+      await authenticateUser()
+      next()
+    } catch (e) {
+      next({ name: 'login' })
+    }
+  } else {
+    next()
+  }
+})
+
+function authenticateUser() {
+  const auth = useFirebaseAuth()
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe() // Desuscribirse después de obtener el estado de autenticación
+      if (user) {
+        resolve(user)
+      } else {
+        reject(new Error('No user authenticated'))
+      }
+    })
+  })
+}
 
 export default router
