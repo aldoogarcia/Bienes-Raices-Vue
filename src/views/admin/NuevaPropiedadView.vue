@@ -1,6 +1,9 @@
         
 <script setup>
+import { collection, addDoc } from "firebase/firestore";
 import {useForm,useField} from 'vee-validate'
+import {useFirestore} from 'vuefire'
+import {useRouter} from 'vue-router'
 import {validationSchema,imageSchema} from '@/validation/propiedadSchema.js'
 
 const {handleSubmit} = useForm({ // solo acepta una validacion por eso las juntamos
@@ -9,9 +12,10 @@ const {handleSubmit} = useForm({ // solo acepta una validacion por eso las junta
         ...validationSchema
     }
 })
-const submit = handleSubmit((values)=>{
-    console.log(values)
-})
+
+const items= [5,4,3,2,1].reverse()
+const db = useFirestore()
+const router = useRouter()
 
 const titulo = useField('titulo')
 const imagen = useField('imagen')
@@ -20,9 +24,25 @@ const habitaciones = useField('habitaciones')
 const wc = useField('wc')
 const estacionamiento = useField('estacionamiento')
 const descripcion = useField('descripcion')
+const alberca = useField('alberca',null,{
+    initialValue:false
+})
+
+const submit = handleSubmit( async (values)=>{
+    const {imagen, ...propiedad}= values
+    // console.log(propiedad)
+
+// Add a new document with a generated id.
+const docRef = await addDoc(collection(db, "propiedades"), {
+    ...propiedad
+});
+// console.log("Document written with ID: ", docRef.id);
+if(docRef.id){
+    router.push({name:'admin-propiedades'})
+}
+})
 
 
-const items= [5,4,3,2,1].reverse()
         
 </script>
 <template>
@@ -118,6 +138,8 @@ const items= [5,4,3,2,1].reverse()
 
             <v-checkbox
                 label="Alberca"
+                v-model="alberca.value.value"
+                :error-messages="alberca.errorMessage.value"
             />
 
             <v-btn
