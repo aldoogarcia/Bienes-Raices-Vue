@@ -1,5 +1,8 @@
         
 <script setup>
+import {ref} from 'vue'
+import "leaflet/dist/leaflet.css";
+import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
 import { collection, addDoc } from "firebase/firestore";
 import {useForm,useField} from 'vee-validate'
 import {useFirestore} from 'vuefire'
@@ -13,11 +16,12 @@ const {handleSubmit} = useForm({ // solo acepta una validacion por eso las junta
     }
 })
 
+const zoom=ref(15)
 const items= [5,4,3,2,1].reverse()
 const db = useFirestore()
 const router = useRouter()
 
-const titulo = useField('titulo')
+const titulo = useField('titulo')   
 const imagen = useField('imagen')
 const precio = useField('precio')
 const habitaciones = useField('habitaciones')
@@ -141,6 +145,16 @@ if(docRef.id){
                 v-model="alberca.value.value"
                 :error-messages="alberca.errorMessage.value"
             />
+
+            <div style="height:600px; width:800px">
+    <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482] " :use-global-leaflet='false'>
+      <l-tile-layer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        layer-type="base"
+        name="OpenStreetMap"
+      ></l-tile-layer>
+    </l-map>
+  </div>
 
             <v-btn
             block
