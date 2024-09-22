@@ -6,10 +6,11 @@ import { useForm, useField } from 'vee-validate'
 import { useFirestore } from 'vuefire'
 import { useRouter } from 'vue-router'
 import { validationSchema, imageSchema } from '@/validation/propiedadSchema.js'
-
+import useImage from '@/composables/useImage'
 import useUbicacionMap from '../../composables/useUbicacion'
 
-const { zoom, center } = useUbicacionMap()
+const { updateImage, url, image } = useImage()
+const { zoom, center, pin } = useUbicacionMap()
 const { handleSubmit } = useForm({
   // solo acepta una validacion por eso las juntamos
   validationSchema: {
@@ -39,7 +40,9 @@ const submit = handleSubmit(async (values) => {
 
   // Add a new document with a generated id.
   const docRef = await addDoc(collection(db, 'propiedades'), {
-    ...propiedad
+    ...propiedad,
+    imagen: url.value,
+    ubicacion: center.value
   })
   // console.log("Document written with ID: ", docRef.id);
   if (docRef.id) {
@@ -74,6 +77,7 @@ const submit = handleSubmit(async (values) => {
               multiple
               v-model="imagen.value.value"
               :error-messages="imagen.errorMessage.value"
+              @change="updateImage"
             />
           </v-col>
 
@@ -85,6 +89,10 @@ const submit = handleSubmit(async (values) => {
             />
           </v-col>
         </v-row>
+        <div v-if="image">
+          <p>imagen subida</p>
+          <img class="w-50 h-50" :src="image" alt="" />
+        </div>
 
         <v-row>
           <v-col cols="12" md="4">
@@ -128,7 +136,7 @@ const submit = handleSubmit(async (values) => {
 
         <div style="height: 600px">
           <LMap ref="map" v-model:zoom="zoom" :center="center" :use-global-leaflet="false">
-            <LMarker draggable :lat-lng="center" />
+            <LMarker draggable :lat-lng="center" @moveend="pin" />
             <LTileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               layer-type="base"
