@@ -1,7 +1,8 @@
 <script setup>
 import usePropiedades from '../../composables/usePropiedades.js'
+import { propertyPrice } from '@/helpers/PropertyPrice'
+const { propiedadesCollection, deleteItem } = usePropiedades()
 
-const { propiedadesCollection, propertyPrice } = usePropiedades()
 // console.log(propiedadesCollection)
 </script>
 <template>
@@ -29,7 +30,9 @@ const { propiedadesCollection, propertyPrice } = usePropiedades()
           >
             Editar
           </v-btn>
-          <v-btn color="warning"> Eliminar </v-btn>
+          <v-btn @click="deleteItem(propiedad.id, propiedad.imagen)" color="warning">
+            Eliminar
+          </v-btn>
         </template>
       </v-list-item>
     </v-list>

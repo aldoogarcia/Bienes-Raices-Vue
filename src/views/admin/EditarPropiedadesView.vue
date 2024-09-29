@@ -1,6 +1,6 @@
 <script setup>
 import { watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useFirestore, useDocument } from 'vuefire'
 import { doc, updateDoc } from 'firebase/firestore'
 import { useField, useForm } from 'vee-validate'
@@ -11,6 +11,8 @@ import useUbicacionMap from '../../composables/useUbicacion'
 import { validationSchema } from '@/validation/propiedadSchema'
 
 const route = useRoute()
+const router = useRouter()
+
 const db = useFirestore()
 const docRef = doc(db, 'propiedades', route.params.id)
 const propiedad = useDocument(docRef)
@@ -27,12 +29,30 @@ watch(propiedad, (propiedad) => {
 })
 const items = [1, 2, 3, 4, 5]
 
-const { url, uploadImage, image } = useImage()
+const { url, updateImage, image } = useImage()
 const { zoom, center, pin } = useUbicacionMap()
 
 const { handleSubmit } = useForm({ validationSchema })
 
-const submit = handleSubmit()
+const submit = handleSubmit(async (values) => {
+  const { imagen, ...propiedad } = values
+  if (image.value) {
+    const data = {
+      ...propiedad,
+      imagen: url.value,
+      ubicacion: center.value
+    }
+    await updateDoc(docRef, data)
+  } else {
+    const data = {
+      ...propiedad,
+      ubicacion: center.value
+    }
+    await updateDoc(docRef, data)
+  }
+
+  router.push({ name: 'admin' })
+})
 
 const titulo = useField('titulo')
 const imagen = useField('imagen')
@@ -67,11 +87,13 @@ const alberca = useField('alberca')
         prepend-icon="mdi-camera"
         label="Fotografía"
         class="mb-5"
-        @change="uploadImage"
+        @change="updateImage"
       ></v-file-input>
 
       <div class="my-5">
-        <p class="font-weight-bold">Imagen Actual:</p>
+        <p class="font-weight-bold">{{ image ? 'Nueva imagen' : 'Imagen actual' }}</p>
+        <img v-if="image" width="180" :src="image" alt="" />
+        <img v-else width="180" :src="propiedad?.imagen" />
       </div>
 
       <v-text-field

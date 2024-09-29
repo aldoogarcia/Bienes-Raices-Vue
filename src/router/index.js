@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { onAuthStateChanged } from 'firebase/auth'
-import { useFirebaseAuth } from 'vuefire';
+import { useFirebaseAuth } from 'vuefire'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -16,6 +16,11 @@ const router = createRouter({
       name: 'login',
       component: () => import('../views/LoginView.vue')
     },
+    {
+      path: '/propiedadView/:id',
+      name: 'muestra-propiedad',
+      component: () => import('../views/PropiedadView.vue')
+    },
 
     //meta requerido
     {
@@ -30,25 +35,24 @@ const router = createRouter({
       component: () => import('../views/admin/NuevaPropiedadView.vue'),
       meta: { requiresAuth: true }
     },
-      
-        {
-          path: '/propiedades',
-          name: 'admin-propiedades',
-          component: () => import('../views/admin/AdminView.vue'),
-          meta: { requiresAuth: true }
-        },
-        {
-          path: '/editar/:id',
-          name: 'admin-editar',
-          component: () => import('../views/admin/EditarPropiedadesView.vue'),
-          meta: { requiresAuth: true }
-        },
-      
+
+    {
+      path: '/propiedades',
+      name: 'admin-propiedades',
+      component: () => import('../views/admin/AdminView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/editar/:id',
+      name: 'admin-editar',
+      component: () => import('../views/admin/EditarPropiedadesView.vue'),
+      meta: { requiresAuth: true }
+    }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.matched.some(route => route.meta.requiresAuth)
+  const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
   if (requiresAuth) {
     try {
       await authenticateUser()
