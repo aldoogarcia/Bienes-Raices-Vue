@@ -2,7 +2,7 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
-##Access credentials to log in:
+## Access credentials to log in:
 
 Email: admin@email.com
 
