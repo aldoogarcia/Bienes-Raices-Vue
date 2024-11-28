@@ -2,11 +2,11 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
-#Access credentials to log in:
+##Access credentials to log in:
 
-#Email: aldo@aldo.com
+Email: admin@email.com
 
-#Password: 123456
+Password: 123456
 
 ## Recommended IDE Setup
 
